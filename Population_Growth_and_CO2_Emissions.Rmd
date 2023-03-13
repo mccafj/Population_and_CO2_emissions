@@ -1,0 +1,108 @@
+---
+title: "Population Growth and CO2 Emissions"
+output: html_notebook
+runtime: shiny
+---
+
+# Background
+Exploring the relationship between total population, population growth, and annual CO2 emissions.  Each dataset will be explored and relevant information isolated.  This is for my own curiosity as well as hands-on experience with R following completion of a Google course on using R for data analytics.  Data was obtained from __[ourworldindata.org](ourworldindata.org)__
+
+
+# Imports
+```{r imports}
+library(tidyverse)
+library(readxl)
+library(skimr)
+library(janitor)
+library(shiny)
+```
+
+# Population Total
+
+```{r load pop_total}
+pop_total <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_total.xlsx")
+head(pop_total)
+```
+
+Exploring pop_total worksheet
+```{r pop_total structure}
+str(pop_total)
+```
+
+In summary, there is a column listing countries (197 total), and then columns for population total for each country from 1799, through the present, and then projected populations until 2099.  Deferred using the functions glimpse(), colnames(), and skim_without_charts() as the results wouldn't add to the above understanding.
+
+```{r missing values in pop_total}
+sum(is.na(pop_total))
+mean(is.na(pop_total))
+```
+No missing values present
+
+#  Population Growth
+
+Adding worksheet for population growth as annual percentage
+
+```{r pop_growth}
+pop_growth <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_growth_annual_percent.xlsx")
+head(pop_growth)
+```
+Looking at structure of population growth dataframe
+```{r pop_growth structure}
+str(pop_growth)
+```
+This dataframe contains columns for country (217 total) and years from 1960 to 2019
+
+```{r missing values in pop_growth}
+sum(is.na(pop_growth))
+mean(is.na(pop_growth))
+```
+There are 44 total values, which represent ~0.3% of the total dataset.  
+
+# CO2 emissions
+
+Now to add the worksheet for CO2 emissions
+
+```{r loading CO2 emissions worksheet}
+co2 <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/co2_emissions_tonnes_per_person.xlsx")
+head(co2)
+```
+
+```{r}
+colnames(co2)
+
+```
+
+
+This dataframe again has a column for countries, then many columns for years, with data from 1799 to 2017, but apparently with many missing values.  
+
+
+```{r co2 structure}
+str(co2)
+```
+There appear to be a lot of nulls.  Let's see how many
+
+```{r}
+sum(is.na(co2))
+mean(is.na(co2))
+```
+56.8% of the dataframe is null values.  Considering pop_growth has data only from 1960 to 2019, perhaps we can trim the other dataframes to align with the same time frame.  Let's filter co2 to that range of years and see what the number of nulls is then.  
+
+```{r filter CO2}
+co2df <- co2[c(1, 163:220)]
+colnames(co2df)
+head(co2df)
+```
+
+
+
+```{r}
+sum(is.na(co2df))
+mean(is.na(co2df))
+```
+
+
+
+
+ggplot(data = ,
+  aes=(x=, y=)) +
+  geom_point() +
+  facet_wrap(~col)
