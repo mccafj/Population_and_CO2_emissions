@@ -4,8 +4,10 @@ output: html_notebook
 runtime: shiny
 ---
 
+by Jon McCaffrey
+
 # Background
-Exploring the relationship between total population, population growth, and annual CO2 emissions.  Each dataset will be explored and relevant information isolated.  This is for my own curiosity as well as hands-on experience with R following completion of a Google course on using R for data analytics.  Data was obtained from __[ourworldindata.org](ourworldindata.org)__
+Exploring the relationship between total population, population growth, and annual CO2 emissions.  Each data set will be explored and relevant information isolated.  This is for my own curiosity as well as hands-on experience with R following completion of a __[Google course](https://www.coursera.org/account/accomplishments/verify/5VHN7T9WNPZH)__ on using R for data analytics.  Data was obtained from __[ourworldindata.org](ourworldindata.org)__
 
 
 # Imports
@@ -19,43 +21,69 @@ library(shiny)
 
 # Population Total
 
-```{r load pop_total}
+```{r load pop-total}
 pop_total <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_total.xlsx")
 head(pop_total)
 ```
 
 Exploring pop_total worksheet
-```{r pop_total structure}
+```{r pop-total structure}
 str(pop_total)
 ```
 
-In summary, there is a column listing countries (197 total), and then columns for population total for each country from 1799, through the present, and then projected populations until 2099.  Deferred using the functions glimpse(), colnames(), and skim_without_charts() as the results wouldn't add to the above understanding.
+In summary, there is a column listing countries (197 total), and then columns for population total for each country from 1799, through the present, and then projected populations until 2099.  All values are apparently numeric values are actually characters with "M" representing millions and "k" representing thousands.
+I deferred using the functions glimpse() and skim_without_charts() as the results wouldn't add to the above understanding.
 
-```{r missing values in pop_total}
+```{r}
+colnames(pop_total)
+```
+All column names are characters as well, and not true datevalues.  
+
+```{r missing values in pop-total}
 sum(is.na(pop_total))
 mean(is.na(pop_total))
 ```
 No missing values present
 
+For additional data exploration, I made some conversions to this file in Excel to have the column header of 4 digits was actually recognized as a datevalue of YEAR and not a character, adjusted the numbers from ending in "M" or "k" to being the complete number, and trimmed the data to match the year span in other Excel files (1960-2017) as you'll see below.  I uploaded the edited .xlsx file as well.  
+
+As part of the process on character to accurate year conversion, I'll give credit to these threads: __[here](https://www.mrexcel.com/board/threads/how-can-i-reverse-abbreviated-numbers.1143161/)__
+
+__[and here](https://www.mrexcel.com/board/threads/no-matter-what-i-do-excel-formula-returns-a-date-as-1905.1037386/)__
+
+Here's a quick visual of the converted file for comparison:
+```{r converted-pop-total}
+pop_conv <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_total_converted.xlsx", col_names = TRUE)
+head(pop_conv)
+```
+
 #  Population Growth
 
-Adding worksheet for population growth as annual percentage
+Adding worksheet for population growth as annual percentage.  By default, all values were loaded as character, so I specified each column type, to keep the country column as character and all other values as numeric.
 
-```{r pop_growth}
-pop_growth <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_growth_annual_percent.xlsx")
+```{r pop-growth}
+pop_growth <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_growth_annual_percent.xlsx", col_names=TRUE, col_types=c("text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric","numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"))
+```
+
+```{r}
 head(pop_growth)
 ```
+
+
 Looking at structure of population growth dataframe
-```{r pop_growth structure}
+```{r pop-growth structure}
 str(pop_growth)
 ```
 This dataframe contains columns for country (217 total) and years from 1960 to 2019
 
-```{r missing values in pop_growth}
+```{r missing values in pop-growth}
 sum(is.na(pop_growth))
 mean(is.na(pop_growth))
 ```
-There are 44 total values, which represent ~0.3% of the total dataset.  
+
+
+There are 44 total missing values, which represent ~0.3% of the total dataset.  
+
 
 # CO2 emissions
 
@@ -66,43 +94,88 @@ co2 <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions
 head(co2)
 ```
 
-```{r}
+```{r determining indices of co2 data set}
 colnames(co2)
-
 ```
-
-
 This dataframe again has a column for countries, then many columns for years, with data from 1799 to 2017, but apparently with many missing values.  
-
 
 ```{r co2 structure}
 str(co2)
 ```
 There appear to be a lot of nulls.  Let's see how many
-
 ```{r}
 sum(is.na(co2))
 mean(is.na(co2))
 ```
-56.8% of the dataframe is null values.  Considering pop_growth has data only from 1960 to 2019, perhaps we can trim the other dataframes to align with the same time frame.  Let's filter co2 to that range of years and see what the number of nulls is then.  
+56.8% of the dataframe is null values.  Considering pop_growth has data only from 1960 to 2019 and pop_conv has data from 1960-2017, let's can trim the CO2 dataframe to align with a selected time frame of 1960 to 2017.  Then we can recheck the nulls.  
 
 ```{r filter CO2}
-co2df <- co2[c(1, 163:220)]
-colnames(co2df)
-head(co2df)
+co2small <- co2[c(1, 163:220)]
 ```
 
+```{r colnames-co2df}
+colnames(co2small)
+```
+Now we're only looking at the years 1960-2017
+```{r}
+head(co2small)
+```
+
+```{r}
+sum(is.na(co2small))
+mean(is.na(co2small))
+```
+
+We've now reduced the nulls to 403 total, which is 3.5% of the data set.  
+
+I have an Excel file with the corrected datevalues for this datafame as well.  I'll load it below
+
+```{r correct-dates-CO2}
+co2_conv <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/co2_emissions_tonnes_per_person_small.xlsx")
+head(co2_conv)
+```
+
+
+We'll also reduce the time span represented in the initial pop_growth dataframe to 1960-2017.  Looking at colnames(pop_growth) below gives us the index needed.
+
+```{r}
+colnames(pop_growth)
+```
+
+
+```{r pop-growth-to-2017}
+pop_growth_conv <- pop_growth[c(1:59)]
+head(pop_growth_conv)
+```
+
+# Exploratory graphs
+# ```{r}
+# yearly_counts <- pop_df %>%
+#                  group_by(country) %>%
+#                  summarise(count=n())
+# ```
+# ```{r}
+# yearly_counts
+# ```
+
+
+# ```{r}
+# ggplot(pop_df_conv, aes(x_pop,)
+#   geom_line(mapping=aes(x=x_pop)
+# ```
+# 
+# ```{r}
+# 
+# ```
+# 
+# 
+# ```{r rate-of-pop-total-increase}
+# ggplot(data = pop_df, aes(x=1960:2017, group=country, color=country)) +
+#   geom_line()
+# ```
 
 
 ```{r}
-sum(is.na(co2df))
-mean(is.na(co2df))
+class(-1.45)
 ```
 
-
-
-
-ggplot(data = ,
-  aes=(x=, y=)) +
-  geom_point() +
-  facet_wrap(~col)
