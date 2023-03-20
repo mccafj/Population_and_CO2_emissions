@@ -149,6 +149,7 @@ head(pop_growth_conv)
 ```
 
 # Exploratory graphs
+
 # ```{r}
 # yearly_counts <- pop_df %>%
 #                  group_by(country) %>%
@@ -158,21 +159,9 @@ head(pop_growth_conv)
 # yearly_counts
 # ```
 
-
-# ```{r}
-# ggplot(pop_df_conv, aes(x_pop,)
-#   geom_line(mapping=aes(x=x_pop)
-# ```
-# 
-# ```{r}
-# 
-# ```
-# 
-# 
-# ```{r rate-of-pop-total-increase}
-# ggplot(data = pop_df, aes(x=1960:2017, group=country, color=country)) +
-#   geom_line()
-# ```
+```{r rate-of-pop-total-increase}
+ggplot(data = pop_conv) + geom_line(mapping=aes(x=1960, y=country))
+```
 
 
 ```{r}
