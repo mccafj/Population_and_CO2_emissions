@@ -31,7 +31,7 @@ Exploring pop_total worksheet
 str(pop_total)
 ```
 
-In summary, there is a column listing countries (197 total), and then columns for population total for each country from 1799, through the present, and then projected populations until 2099.  All values are apparently numeric values are actually characters with "M" representing millions and "k" representing thousands.
+In summary, there is a column listing countries (197 total), and then columns for population total for each country from 1799, through the present, and then projected populations until 2099.  All values that are apparently numeric values are actually characters with "M" representing millions and "k" representing thousands.
 I deferred using the functions glimpse() and skim_without_charts() as the results wouldn't add to the above understanding.
 
 ```{r}
@@ -45,7 +45,7 @@ mean(is.na(pop_total))
 ```
 No missing values present
 
-For additional data exploration, I made some conversions to this file in Excel to have the column header of 4 digits was actually recognized as a datevalue of YEAR and not a character, adjusted the numbers from ending in "M" or "k" to being the complete number, and trimmed the data to match the year span in other Excel files (1960-2017) as you'll see below.  I uploaded the edited .xlsx file as well.  
+For additional data exploration, I made some conversions to this file in Excel so the column header of 4 digits was actually recognized as a datevalue of YEAR and not a character, adjusted the numbers from ending in "M" or "k" to being the complete number, and trimmed the data to match the year span in other Excel files (1960-2017) as you'll see below.  I uploaded the edited .xlsx file as well.  
 
 As part of the process on character to accurate year conversion, I'll give credit to these threads: __[here](https://www.mrexcel.com/board/threads/how-can-i-reverse-abbreviated-numbers.1143161/)__
 
@@ -59,13 +59,13 @@ head(pop_conv)
 
 #  Population Growth
 
-Adding worksheet for population growth as annual percentage.  By default, all values were loaded as character, so I specified each column type, to keep the country column as character and all other values as numeric.
+Adding worksheet for population growth as annual percentage.  By default, all values were loaded as character, so I specified each column type, to keep the country column as character and all other values as numeric.  If there's a faster way to accomplish this, I'll have to learn it.
 
 ```{r pop-growth}
 pop_growth <- read_xlsx("C:/Users/JonMc/Documents/Flatiron/Population_and_CO2_emissions/data/population_growth_annual_percent.xlsx", col_names=TRUE, col_types=c("text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric","numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"))
 ```
 
-```{r}
+```{r head-pop-growth}
 head(pop_growth)
 ```
 
@@ -107,7 +107,7 @@ There appear to be a lot of nulls.  Let's see how many
 sum(is.na(co2))
 mean(is.na(co2))
 ```
-56.8% of the dataframe is null values.  Considering pop_growth has data only from 1960 to 2019 and pop_conv has data from 1960-2017, let's can trim the CO2 dataframe to align with a selected time frame of 1960 to 2017.  Then we can recheck the nulls.  
+56.8% of the dataframe is null values.  Considering pop_growth has data only from 1960 to 2019 and pop_conv has data from 1960-2017, we can trim the CO2 dataframe to align with the selected time frame of 1960 to 2017.  Then we can recheck the nulls.  
 
 ```{r filter CO2}
 co2small <- co2[c(1, 163:220)]
@@ -146,25 +146,5 @@ colnames(pop_growth)
 ```{r pop-growth-to-2017}
 pop_growth_conv <- pop_growth[c(1:59)]
 head(pop_growth_conv)
-```
-
-# Exploratory graphs
-
-# ```{r}
-# yearly_counts <- pop_df %>%
-#                  group_by(country) %>%
-#                  summarise(count=n())
-# ```
-# ```{r}
-# yearly_counts
-# ```
-
-```{r rate-of-pop-total-increase}
-ggplot(data = pop_conv) + geom_line(mapping=aes(x=1960, y=country))
-```
-
-
-```{r}
-class(-1.45)
 ```
 
